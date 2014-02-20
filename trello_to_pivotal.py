@@ -9,7 +9,8 @@ import re
 # It is assumed that the member names are equal in trello and pivotal tracker.
 
 # Maps a list to state of the item.
-# Lists not listed  hereends up in the icebox.
+# Cards will not be in the output if their list is not mapped.
+# Use state 'unscheduled' to put in the icebox.
 ALIASES = { 
     'Todo':'unstarted', # Backlog
     'InProgess':'started', 
@@ -77,7 +78,9 @@ for page, cards in enumerate(paginate(board['cards'], 100)):
 
 
             list = lists[card['idList']]
-            current_state = ALIASES.get(list, 'unscheduled')
+            if list not in ALIASES:
+              continue
+            current_state = ALIASES[list]
             estimate =    ESTIMATES.get(list, -1)
 
             labels = [label['name'] for label in card['labels']]
