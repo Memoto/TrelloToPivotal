@@ -37,6 +37,10 @@ members = {}
 for member in board['members']:
     members[member['id']] = member['fullName']
 
+checklists = {}
+for checklist in board['checklists']:
+    checklists[checklist['id']] = checklist
+
 now = datetime.datetime.now().strftime("%Y-%m-%d+%H:%M")
 from os import path
 if not path.exists('trello'):
@@ -56,7 +60,8 @@ for card in board['cards']:
     if card['closed']:
         continue
     num_tasks = 0
-    for checklist in card['checklists']:
+    for checklistId in card['idChecklists']:
+        checklist = checklists[checklistId]
         num_tasks += len(checklist['checkItems'])
     max_num_tasks += num_tasks
 all_cards = board['cards']
@@ -91,7 +96,8 @@ for page, cards in enumerate(paginate(board['cards'], 100)):
             checkItemStates = {item['idCheckItem']: item['state'] for item in card['checkItemStates']}
 
             tasks = []
-            for checklist in card['checklists']:
+            for checklistId in card['idChecklists']:
+                checklist = checklists[checklistId]
                 pre = checklist['name']+": " if checklist['name'] != "Checklist" else ''
                 for item in checklist['checkItems']:
                     tasks += [(pre+item['name']).encode('utf-8')]
